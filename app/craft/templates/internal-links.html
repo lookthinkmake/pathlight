@@ -1,0 +1,40 @@
+{#
+ # News index template
+ # -------------------
+ #
+ # This template is loaded whenever http://example.com/news is
+ # requested, because it is located at news/index.html in your
+ # craft/templates/ folder.
+ #
+ # See this page for more details on how Craft routes requests:
+ # http://buildwithcraft.com/docs/routing
+ #}
+
+{% extends "_layout" %}
+{% set title = "Internal Links" %}
+
+{% block content %}
+	<style>
+	    article {
+	        max-width: 1200px;
+	        width: 100%;
+	        margin: 100px auto 0 auto;
+	        padding: 0 15px;
+	    }
+
+	    .sayHello {
+	        display: none;
+	    }
+
+	    body {
+	        margin-bottom: 100px !important;
+	    }
+	</style>
+
+	
+
+		<article>
+			<h1>{{ entry.title }}</h1>
+			{{ entry.body }}
+		</article>
+{% endblock %}

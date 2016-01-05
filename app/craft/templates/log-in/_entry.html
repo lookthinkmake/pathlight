@@ -1,0 +1,76 @@
+{#
+ # News entry template
+ # -------------------
+ #
+ # This template gets loaded whenever a News entry’s URL is
+ # requested. That’s because the News section’s Template setting is
+ # set to “news/_entry”, the path to this template.
+ #
+ # When this template is loaded, it will already have an ‘entry’
+ # variable, set to the requested News entry.
+ #
+ # See this page for more details on how Craft routes requests:
+ # http://buildwithcraft.com/docs/routing
+ #}
+
+{% extends "_layout" %}
+
+{% block content %}
+<script>document.getElementsByTagName('body')[0].className+='internal'</script>
+  <section class="loginSection">
+      <div class="copySectionCopy">
+          <h2>{{entry.title}}</h2>
+          {{entry.heading}}
+          <span class="alsoSearch">SWITCH TO: {% for city in craft.entries.section('logInForm').order('title') %}
+              {% if city.id != entry.id %}
+                  <a href="{{city.url}}">{{city.title}}</a>
+              {% endif %}
+          {% endfor %}</span>
+          <hr>
+          <script type='text/javascript' src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAArT_jjwCIWNLcCPcKoZ7pixQgZNQf2Lua7qe6S67ReIqRe4aVQBSkLucm3QCHOqkticKJRFS3azn2gQ'></script>
+          <script type='text/javascript' src='http://app.propertyware.com/pw/website/widgets/config.jsp?wid={{entry.propertywareConfigId}}'></script>
+          <script type='text/javascript' src='http://app.propertyware.com/pw/website/widgets/pw_widgets_v2.js?sid={{entry.propertywareWidgetId}}'></script>
+          <!--Widget start-->
+          <div>
+              <h3>To login, please click the button below</h3>
+              <a style="background-color: #519ad0; color: #ffffff; padding: 10px 50px; margin: 0 auto; display: inline-block;" href="https://app.propertyware.com/pw/portals/pathlightmgt/tenant.action" target="_blank">Log in</a> 
+          </div>
+          <!-- <div class="pw-skin-portal widget_version_2">
+              <form id="portalLoginForm" name="portalLoginForm" action="#" method="post">
+                  <input type="hidden" name="loginType" value="Tenant" id="loginType"/>
+                  <div class="yui-b" style="text-align: center">
+                      <div class="yui-gd">
+                          <div class="yui-u first">
+                              <div id="loginDiv" style="">
+                                  <h3>Secure Login</h3>
+                                  <br />
+                                  <th>Email Address</th>
+                                  <input type="text" name="username" value="" id="username" />
+                                  <th>Password</th>
+                                  <input type="password" name="password" id="password" />
+                                  <div class="primaryButtons">
+                                      <input type="button" id="loginForm_0" value="Sign In" class="button" onclick="portalLogin();"/>
+                                  </div>
+                                  <p style="padding-top: 1em"><a href="javascript:portalForgotPassword('tenants.html');" style="text-decoration: underline; color: #000000; font-weight: bold ">Forgot your password?</a></p>
+                                  <p style="padding-top: 1em"><strong>Don't have an Account?</strong> <br />Signing up is easy, fast and secure.</p>
+                                  <div class="primaryButtons">
+                                      <a href="javascript:portalSignUp('tenants.html');" class="button"><span>Sign up</span></a>
+                                  </div>
+                              </div>
+                              <div  class="errorBox" id="cookieError" style="width:100%;display:none;border:2px solid aliceblue;padding:3px;margin:0;height:380px ">
+                                  <h3 style="font-size:16px">Cookies not enabled</h3>
+                                  <ul style="margin:15px">
+                                      <li>In order to login and use the Tenant Portal, you must have cookies enabled on your browser.</li><br/>
+                                      <li> Please access your browser's internet options, and enable cookies from the Privacy area, then log into your account.</li>
+                                  </ul>
+                                  <a href="http://www.google.com/cookies.html" target="_blank">How to enable cookies?</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+          </div> -->
+          <!--Widget end-->
+          </div><!-- /.copySectionCopy -->
+          </section><!-- /copySection -->
+{% endblock %}

@@ -1,0 +1,13 @@
+$blue: #519AD0;
+$yellow: #FDD82C;
+$white: #FFFFFF;
+$gray: #404040;
+$light_gray: #B3B3B3;
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}

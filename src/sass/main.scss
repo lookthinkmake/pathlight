@@ -1,0 +1,1043 @@
+@import url("//hello.myfonts.net/count/2b4565");
+@import 'bourbon';
+@import 'base/base';
+@import 'neat';
+@import 'vars';
+
+
+@font-face {font-family: 'Proxima Nova Soft Medium';src: url('../fonts/2B4565_0_0.eot');src: url('../fonts/2B4565_0_0.eot?#iefix') format('embedded-opentype'),url('../fonts/2B4565_0_0.woff') format('woff'),url('../fonts/2B4565_0_0.ttf') format('truetype');}
+@font-face {font-family: 'Proxima Nova Soft SemiBold';src: url('../fonts/2B4565_1_0.eot');src: url('../fonts/2B4565_1_0.eot?#iefix') format('embedded-opentype'),url('../fonts/2B4565_1_0.woff') format('woff'),url('../fonts/2B4565_1_0.ttf') format('truetype');}
+@font-face {font-family: 'Proxima Nova Soft Bold';src: url('../fonts/2B4565_2_0.eot');src: url('../fonts/2B4565_2_0.eot?#iefix') format('embedded-opentype'),url('../fonts/2B4565_2_0.woff') format('woff'),url('../fonts/2B4565_2_0.ttf') format('truetype');}
+@font-face {font-family: 'Proxima Nova Soft Regular';src: url('../fonts/2B4565_3_0.eot');src: url('../fonts/2B4565_3_0.eot?#iefix') format('embedded-opentype'),url('../fonts/2B4565_3_0.woff') format('woff'),url('../fonts/2B4565_3_0.ttf') format('truetype');}
+html{
+  position: relative;
+  min-height: 100%;
+}
+body, html{
+  font-family: 'Proxima Nova Soft Regular';
+  margin: 0;
+  padding: 0;
+}
+h1,h2,h3,h4,h5,h6{
+  font-family: 'Proxima Nova Soft Regular';
+}
+nav{
+  @include clearfix;
+  background: $blue;
+  background: rgba($blue, .9);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9998;
+  h1{
+    @include hide-text;
+    background: url(../img/logoWhite.png);
+    height: 50px;
+    margin: 15px;
+    width: 205px;
+    float: left;
+    @media screen and (max-width: 1300px){
+      background-size: contain;
+      background-repeat: no-repeat;
+      float: left;
+      margin: 15px 25px;
+      height: 35px;
+      width: 145px;
+    }
+  }
+  .mobileToggle{
+    display: none;
+    cursor: pointer;
+    @media screen and (max-width: 1300px){
+      color: $white;
+      display: block;
+      float: right;
+      margin: 20px 25px 15px;
+    }
+  }
+  ul{
+    float: right;
+    margin: 25px 0;
+    @media screen and (max-width: 1300px){
+      border: 1px solid $white;
+      border-style: solid none none;
+      display: none;
+      float: none;
+      margin: 75px auto 15px;
+      padding: 15px 0 0;
+      text-align: center;
+      width: 100%;
+    }
+    li{
+      display: inline-block;
+      font-family: 'Proxima Nova Soft SemiBold';
+      font-size: .9em;
+      letter-spacing: .125em;
+      text-transform: uppercase;
+      &:after{
+        color: $white;
+        content: '|';
+        font-family: 'Proxima Nova Soft Bold';
+        margin: 0 15px 0 20px;
+        @media screen and (max-width: 1024px){
+          margin: 0 5px 0 10px;
+        }
+      }
+      &:last-child{
+        &:after{
+          content: '';
+        }
+      }
+      a, a:visited{
+        @include transition(all .5s ease);
+        color: $white;
+        &:hover{
+          color: $yellow;
+        }//:hover, &:visited
+      }//a
+    }//li
+  }//ul
+}//nav
+
+.homeSection{
+  overflow: hidden;
+  height: 100%;
+  max-height: 100%;
+  position: relative;
+  @media screen and (max-width: 1024px){
+    display: none;
+  }
+  .hero{
+    background: $blue;
+    background: rgba($blue, .8);
+    color: $white;
+    margin: 45px 0 0;
+    padding: 50px 0;
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    img{
+      width: 75%;
+    }
+    h2{
+      font-size: 7em;
+      text-transform: uppercase;
+      @media screen and (max-width: 1700px){
+        font-size: 6em;
+      }//mq 1700px
+      @media screen and (max-width: 1200px){
+        font-size: 5em;
+      }//mq 1200px
+      @media screen and (max-width: 1024px){
+        font-size: 3em;
+      }//mq 1024px
+      svg{
+      margin: -105px 0;
+        width: 60%;
+        max-width: 1000px;
+        @media screen and (max-width: 1300px){
+          max-width: 65%;
+          margin: -175px 0;
+        }
+        @media screen and (max-width: 1024px){
+          max-width: 80%;
+          margin: -150px 0;
+        }
+        @media screen and (max-width: 768px){
+          max-width: 80%;
+          margin: -200px 0;
+        }
+      }
+    }
+    a{
+      text-decoration: underline;
+      h3{
+        text-decoration: underline;
+      }
+    }
+    h3{
+      color: $white;
+      font-size: 2.75em;
+      @media screen and (max-width: 1200px){
+        font-size: 2em;
+      }//mq 1200px
+    }//h3
+    h4{
+    }//h4
+
+  }//hero
+  .heroBackground{
+    max-width: none !important;
+  }
+}//homeSection
+  .heroBoxes{
+    @include outer-container;
+    background: $white;
+    padding: 15px 0;
+    max-width: none;
+    position:relative;
+    z-index: 2;
+    @media screen and (max-width: 1024px){
+      padding: 75px 0 15px;
+    }
+    .heroBox{
+      @include span-columns(3);
+      background: $yellow;
+      color: $white;
+      cursor: pointer;
+      margin: 0 0 0 1%;
+      overflow: hidden;
+      min-height: 100px;
+      position: relative;
+      text-align: center;
+      width: 23.75%;
+      display: table;
+      @media screen and (max-width: 1024px){
+        margin: 0 0 25px 1%;
+        width: 48.75%;
+      }//mq
+      @media screen and (max-width: 1024px){
+        width: 98.75%;
+      }//mq
+      &:hover{
+        background: $blue;
+      }
+      h4{
+        display: table-cell; vertical-align: middle;
+        font-size: 2.5em;
+        position: relative;
+        z-index: 2;
+        line-height: 0.85;
+        @media screen and (max-width: 1500px){
+          font-size: 1.9em;
+        }
+      }
+      img{
+        opacity: .25;
+        z-index: 1;
+        max-width: none !important;
+      }//img
+    }//homeBox
+  }//heroBoxes
+
+.copySection{
+  @include outer-container;
+  max-width: 135em;
+  padding: 25px 0;
+    @media screen and (max-width: 1200px){
+      padding: 25px;
+    }
+  .copySectionCopy{
+    @include span-columns(6);
+    @include shift(2);
+    @media screen and (max-width: 1500px){
+      @include shift(1);
+    }
+    @media screen and (max-width: 1200px){
+      @include shift(0);
+      @include span-columns(8);
+      max-width: 68em;
+    }
+    @media screen and (max-width: 960px){
+      @include span-columns(12);
+    }
+    color: $gray;
+
+    h2{
+      color: $yellow;
+      font-family: 'Proxima Nova Soft Regular';
+      font-size: 4.5em;
+      text-transform: uppercase;
+      @media screen and (max-width: 1024px){
+        font-size: 3.5em;
+      }
+      @media screen and (max-width: 768px){
+        font-size: 2.5em;
+      }
+    }//h2
+    h3{
+      color: $blue;
+      margin: 0 auto 15px;
+      @media screen and (max-width: 768px){
+        font-size: 1.5em;
+      }
+    }
+.cityList{
+  text-align: center;
+  width: 100%;
+  h4{
+    margin: 0 auto 10px;
+    text-transform: uppercase;
+  }//h4
+  a{
+  .cityTitle{
+    background: $blue;
+    color: $yellow;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    h3{
+      font-size: 7em;
+      padding: 15px;
+      color: $yellow;
+      position: relative;
+      text-transform: uppercase;
+      z-index: 2;
+      @media screen and (max-width: 1024px){
+        font-size: 6em;
+      }
+      @media screen and (max-width: 960px){
+        font-size: 4em;
+      }
+      @media screen and (max-width: 600px){
+        font-size: 3em;
+      }
+    }
+    img{
+      @include transition (all 0.5s ease);
+      left: 0;
+      opacity: .2;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      z-index: 1;
+    }//img
+    &:hover{
+      img{
+        opacity: .05;
+      }//img
+    }//hover
+  }//cityTitle
+    &:nth-child(even){
+      .cityTitle{
+        background: $yellow;
+        color: $blue;
+        h3{
+        color: $blue;
+        }
+      }
+    }
+  }
+}//cityList
+  }
+  img{
+    @include span-columns(4);
+    @media screen and (max-width: 960px){
+      @include shift(2);
+      @include span-columns(8);
+    }
+    @media screen and (max-width:700px){
+      @include shift(0);
+      @include span-columns(12);
+    }
+  }
+  .citySelectBoxContainer{
+    @include span-columns(2);
+    padding: 50px 0 0;
+    text-align: center;
+    @media screen and (max-width: 960px){
+      @include span-columns(6);
+      @include shift(3);
+    }
+    @media screen and (max-width: 600px){
+      @include span-columns(12);
+      @include shift(0);
+    }
+      select{
+        width: 100%;
+      }
+      input{
+        background: $yellow;
+        color: $blue;
+        text-transform: uppercase;
+      }//input
+
+    }//citySelectBoxContainer
+    // &:nth-child(even){
+    //   margin:0 auto 0 0;
+    // }//nth-child(even)
+      &+.copySection{
+        border: 1px solid $yellow;
+        border-style: solid none none;
+      }//+copySection
+}//copySection
+.fAQHeader{
+  @extend .copySection;
+  border: 1px solid $yellow;
+  border-style: none none solid;
+  margin: 0;
+  max-width: none;
+
+  width: 100%;
+  .copySectionCopy{
+    @include span-columns(6);
+    @include shift(3);
+    @media screen and (max-width: 1024px){
+      @include shift(0);
+      @include span-columns(12);
+    }
+  }
+  ul{
+    padding: 0 0 0 25px;
+    li{
+      color: $blue;
+    }
+  }
+}//fAQHeader
+.fAQSection{
+  @extend .fAQHeader;
+  padding: 25px 0;
+  @media screen and (max-width: 1024px){
+    padding: 25px;
+  }
+  &:nth-child(odd){
+    background: $yellow;
+  }
+  ul{
+    list-style-type: disc;
+    padding: 0 0 0 25px;
+    margin: 0 0 15px;
+    // text-indent: -5px;
+    li{
+      color: $gray;
+    }
+  }
+  ol{
+    list-style-type: decimal;
+    padding: 0 0 0 25px;
+    margin: 0 0 15px;
+    // text-indent: -5px;
+    li{
+      color: $gray;
+    }
+  }
+}//fAQHeader
+.loginSection{
+  @extend .copySection;
+  max-width: 68em;
+  padding: 25px 0;
+  .copySectionCopy{
+    @include span-columns(12);
+    @include shift(0);
+  }
+}//loginSection
+#portalLoginForm{
+  @include span-columns(6);
+  @include shift(3);
+}
+#loginForm_0{
+  margin: 0 auto;
+}
+::-webkit-input-placeholder {
+   color: $white;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+   color: $white;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+   color: $white;
+}
+#sayHelloSubmit::-webkit-input-placeholder {
+   color: $blue;
+}
+#sayHelloSubmit:-moz-placeholder { /* Firefox 18- */
+   color: $white;
+}
+
+#sayHelloSubmit::-moz-placeholder {  /* Firefox 19+ */
+   color: $white;
+}
+.sayHello{
+  @include outer-container;
+  background: $yellow;
+  max-width: none;
+  padding: 25px 50px;
+  text-align: center;
+
+  h2{
+
+    font-size: 4.75em;
+    text-transform: uppercase;
+    color: $white;
+    @media screen and (max-width: 1024px){
+      font-size: 3.5em;
+    }
+    @media screen and (max-width: 768px){
+      font-size: 2.5em;
+    }
+  }//h2
+  h3{
+    color: $white;
+    margin: 0 auto 15px;
+  }
+  .formContainer{
+    margin: 0 auto;
+    max-width: 1200px;
+    input{
+      @include span-columns(4);
+      background: $blue;
+      border: none;
+      color: $white;
+      font-family: 'Proxima Nova Soft Regular';
+      @media screen and (max-width: 1024px){
+        @include span-columns(12);
+      }
+      &[type=submit]{
+        background: $white;
+        color: $blue !important;
+        @include shift(4);
+        @media screen and (max-width: 1024px){
+          @include shift(0);
+        }
+      }//text
+    }//input
+      textarea{
+        @include span-columns(12);
+        float: left;
+        background: $blue;
+        color: $white;
+        font-family: 'Proxima Nova Soft Regular';
+      }//textarea
+    }//formContainer
+}//.sayHello
+.cityList{
+  text-align: center;
+  width: 100%;
+  h4{
+    margin: 0 auto 10px;
+    text-transform: uppercase;
+  }//h4
+  a{
+  .cityTitle{
+    background: $blue;
+    color: $yellow;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    h3{
+      font-size: 7em;
+      padding: 15px;
+      position: relative;
+      text-transform: uppercase;
+      z-index: 2;
+      @media screen and (max-width: 1024px){
+        font-size: 6em;
+      }
+      @media screen and (max-width: 960px){
+        font-size: 4em;
+      }
+      @media screen and (max-width: 600px){
+        font-size: 3em;
+      }
+    }
+    img{
+      @include transition (all 0.5s ease);
+      left: 0;
+      opacity: .2;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      z-index: 1;
+    }//img
+    &:hover{
+      img{
+        opacity: .05;
+      }//img
+    }//hover
+  }//cityTitle
+    &:nth-child(even){
+      .cityTitle{
+        background: $yellow;
+        color: $blue;
+      }
+    }
+  }
+}//cityList
+.bottomContainer{
+  padding: 15px 0 0;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  footer{
+    @include clearfix;
+    background: $blue;
+    color: $white;
+    margin: 15px auto 0;
+    padding: 15px;
+      @media screen and (max-width: 600px){
+        text-align: center;
+      }
+    p{
+      float: left;
+      margin: 15px 0 0;
+      @media screen and (max-width: 600px){
+        float: none;
+        margin: 0 auto;
+      }
+    }
+    .footerLogos{
+      float: right;
+      @media screen and (max-width: 600px){
+        float: none;
+        margin: 0 auto;
+      }
+    }
+  }//footer
+}//.bottomContainer
+
+
+#pw_listing_widget_searchForm{
+  background: $yellow;
+  padding: 15px 0 0;
+  #searchForm{
+    @include clearfix;
+    @include outer-container;
+    max-width: 1200px;
+    font-size: .75em;
+    color: $gray;
+      @media screen and (max-width: 1024px){
+        padding: 15px;
+      }
+    label{
+      // display: none;
+    }//label
+    input, select{
+      float: left;
+    }//input
+    .locationSection{
+      @include span-columns(2);
+      @media screen and (max-width: 1024px){
+        @include span-columns(4);
+      }
+    }
+    .priceRangeSection{
+      @include span-columns(2);
+      @media screen and (max-width: 1024px){
+        @include span-columns(4);
+      }
+    #minField, #maxField{
+      @include span-columns(1 of 2);
+      @media screen and (max-width: 1024px){
+        @include span-columns(2 of 4);
+      }
+    }
+    }
+    .typeSection{
+      @include span-columns(1);
+      @media screen and (max-width: 1024px){
+        @include span-columns(2);
+      }
+    }
+    .availableSection{
+      @include span-columns(3);
+      @media screen and (max-width: 1024px){
+        @include span-columns(4);
+      }
+    }
+    .dateSelection{
+      float: left;
+      width: 100%;
+      &.first{
+        display: none;
+        p{
+        }
+      }
+      p{
+        float: left;
+      }
+      input[type=text]{
+        width: 75px;
+      }
+    }
+    .bedSelection{
+      @include span-columns(1);
+      @media screen and (max-width: 1024px){
+        @include span-columns(2);
+      }
+    }
+    .bathSelection{
+      @include span-columns(1);
+      @media screen and (max-width: 1024px){
+        @include span-columns(2);
+      }
+    }
+    .searchButtonSection{
+      @include span-columns(1);
+      padding: 15px 0 0;
+    }
+    .searchOptionsSection{
+      @include span-columns(4);
+      @include shift(4);
+    }
+  }//searchForm
+  #moreSearchOptsSpan{
+        background: $blue;
+        color: $white;
+        cursor: pointer;
+        display: inline-block;
+        font-family: 'Proxima Nova Soft Bold';
+        font-size: 1em;
+        padding: 5px;
+        text-transform: uppercase;
+        margin: 0 auto 15px;
+  }
+  #moreOptsRow{
+    @include span-columns(12);
+    #pw_listing_widget_search_leasing_contacts_div, #pw_listing_widget_search_amenities_div{
+      @include clearfix;
+      span{
+        border: 1px solid $white;
+        border-style: none none solid;
+      }
+    }
+  li.amenitiesListItem {
+  float: left;
+  margin: 0 5px 5px 0;
+}
+  }
+}//pw_listing_widget_searchForm
+#sortSelect{
+  float: left;
+  font-size: .7em;
+  margin: 15px 0;
+}
+#pw_listing_widget_tabs_list, #pw_listing_widget_tabs_map, #pw_listing_widget_tabs_detail_container{
+  margin: 0 auto;
+  max-width: 1200px;
+}
+#pw_listing_widget_tabs_list{
+  h3{
+    border: 1px solid $yellow;
+    border-style: none none solid;
+    color: $blue;
+    font-size: 5.25em;
+    text-transform: uppercase;
+    text-align: center;
+    @media screen and (max-width: 1200px){
+      font-size: 4em;
+    }
+    @media screen and (max-width: 1024px){
+      font-size: 3em;
+    }
+    @media screen and (max-width: 768px){
+      font-size: 1.75em;
+    }
+  }
+}
+.ui-tabs .ui-tabs-hide{
+  display: none;
+}
+.pw_listing_widget_tabs_list_item_img{
+  height: 300px;
+  width: 300px;
+}
+.ui-dialog{
+  background: $white;
+  border: 1px solid $blue;
+  padding: 15px;
+}
+.pw_listing_widget_content_bar{
+  background: $yellow;
+  text-align: center;
+  a{
+    color: $blue;
+    display: inline-block;
+    font-family: 'Proxima Nova Soft Bold';
+    font-size: .8em;
+    letter-spacing: .125em;
+    padding: 5px 15px;
+    text-transform: uppercase;
+  }
+}
+a[href^="javascript:gotoDetail("]{
+  color: $blue;
+  font-size: 2em;
+  text-transform: uppercase;
+}
+  .ui-tabs-nav{
+    position:absolute;
+    background: $yellow;
+    @include clearfix;
+    @media screen and (max-width: 1620px){
+      position: relative;
+      text-align: center;
+      margin: 0 auto 15px;
+    }
+    li{
+      display: inline-block;
+      a{
+        color: $gray;
+        display: block;
+        font-family: 'Proxima Nova Soft Bold';
+        font-size: .8em;
+        padding: 15px;
+        text-transform: uppercase;
+      }//a
+      &.ui-state-active{
+        a{
+          color: $blue;
+        }//a
+      }//ui-state-active
+    }//li
+  }
+#pw_listing_widget_tabs_detail_inner_tabs{
+
+  .ui-tabs-nav{
+    @include clearfix;
+    background: $blue;
+    margin: 0 auto 0;
+    padding: 0;
+    position:relative;
+    width: 100%;
+    text-align: center;
+    li{
+
+      a{
+        color: $gray;
+        display: block;
+        font-family: 'Proxima Nova Soft Bold';
+        font-size: .8em;
+        padding: 15px;
+        text-transform: uppercase;
+        &:hover{
+          color: $yellow;
+        }
+      }//a
+      &.ui-state-active{
+        a{
+          background: $yellow;
+          color: $blue;
+        }//a
+      }//ui-state-active
+    }//li
+  }
+}
+.alsoSearch{
+  font-family: 'Proxima Nova Soft Bold';
+  color: $blue;
+  font-size:1.125em;
+  text-transform: uppercase;
+  a{
+    color: $gray;
+    font-family: 'Proxima Nova Soft Regular';
+    font-size: .75em;
+    letter-spacing: .125em;
+    &:hover{
+      color: $blue;
+    }
+    &:after{
+      content: "•";
+      margin: 0 5px;
+    }
+    &:last-child{
+      &:after{
+        content: "";
+      }
+    }
+  }
+}
+#pw_listing_widget_tabs_detail_description{
+  background: $yellow;
+  margin: 0 auto 15px;
+  padding: 15px;
+}
+#ui-datepicker-div{
+  background: $white;
+  max-width: 400px;
+  padding: 25px;
+  position: relative;
+  top: 0;
+}
+#pw_listing_widget_tabs_detail_image{
+  height: 300px;
+  width: 300px;
+}
+.pw_listing_widget_tabs_list_item{
+  @include outer-container;
+  border: 1px solid $yellow;
+  border-style: none none solid;
+  .listTable{
+    @include span-columns(12);
+    .listItemImgTd{
+      @include span-columns(4);
+      margin: 0;
+      @media screen and (max-width: 1024px){
+        @include span-columns(5);
+      }
+      @media screen and (max-width: 768px){
+        @include span-columns(12);
+      }
+    }//listItemImgTd
+    .listItemDescTd{
+      @include span-columns(8);
+      @include reset-display;
+      @include pad();
+      @media screen and (max-width: 1024px){
+        @include span-columns(6);
+      }
+      @media screen and (max-width: 768px){
+        @include span-columns(12);
+      }
+      a{
+        display: block;
+        width: 100%;
+      }
+      br{
+        display: none;
+      }
+      td{
+        font-size: .8em;
+        float: left;
+        width: 100% !important;
+      }
+    }//listItemDescTd
+  }//listTable
+}//pw_listing_widget_tabs_list_item
+
+.pw_listing_widget_content_bar{
+  border: 1px solid $yellow;
+  border-style: none none solid;
+}//pw_listing_widget_content_bar
+#pw_listing_widget_tabs_list_BrochureLink, #pw_listing_widget_tabs_list_NotifyMe{
+  display: inline-block;
+  span{
+        color: $gray;
+        display: block;
+        font-family: 'Proxima Nova Soft Bold';
+        font-size: .8em;
+        padding: 15px;
+        text-transform: uppercase;
+  }//span
+}//
+.listItemImgTdMapLink{
+        background: $white;
+        border: 2px solid $light_gray;
+        color: $light_gray;
+        display: inline-block;
+        font-family: 'Proxima Nova Soft Bold';
+        font-size: .8em;
+        padding: 15px;
+        text-transform: uppercase;
+}//listItemImgTdMapLink
+#pw_listing_widget_tabs_detail_summary{
+  div{
+    // display: inline;
+  }
+}
+#pw_listing_widget_tabs_detail_image_browser{
+
+  }//pw_listing_widget_tabs_detail_image_browser
+
+#pw_listing_widget_tabs_detail_top_section{
+  @include outer-container;
+  #pw_listing_widget_tabs_detail_image_browser{
+  @include span-columns(4);
+  @media screen and (max-width: 1024px){
+    @include span-columns(5);
+  }
+  @media screen and (max-width: 768px){
+    @include span-columns(12);
+  }
+  #pw_listing_widget_tabs_detail_imageContainer{
+    @include span-columns(4 of 4);
+      @media screen and (max-width: 1024px){
+        @include span-columns(5 of 5);
+      }
+      @media screen and (max-width: 768px){
+        @include span-columns(12 of 12);
+      }
+  }
+  #pw_listing_widget_tabs_detail_imageControls{
+    @include clearfix;
+    width: 300px;
+    a{
+      cursor: pointer;
+      display: block;
+      float: left;
+      width: 33%;
+      text-align: center;
+    }
+  }
+  }//pw_listing_widget_tabs_detail_imageContainer
+
+  #pw_listing_widget_tabs_detail_summary{
+    @include span-columns(7);
+    h5{
+      display: inline;
+    }
+  }
+}//pw_listing_widget_tabs_detail_top_section
+
+.listingHeader{
+  border: 1px solid $gray;
+  border-style: none none solid;
+  text-align: center;
+  h3{
+    font-size: 2.75em;
+  }
+  p{
+    font-size: 1.5em;
+  }
+}
+#pw_listing_widget_tabs_detail_price{
+  color: $blue;
+}
+#pw_listing_widget_tabs_detail_inner_tabs{
+  .ui-tabs-nav{
+    li{
+      display: inline-block;
+    }
+  }//ui-tabs-nav
+}//pw_listing_widget_tabs_detail_inner_tabs
+#pw_listing_widget_wait_list_dialog{
+  background: $white;
+  padding: 25px;
+  z-index: 9999;
+}
+.listItemImgTdMapLink{
+  display: none;
+}
+#pw_listing_widget_tabs_detail_detailCommunityInfo, #pw_listing_widget_tabs_detail_detailTools{
+  background: $yellow;
+  ul{
+    text-align: center;
+    li{
+      display: inline-block;
+      a{
+        background: $yellow;
+        color: $gray;
+        display: block;
+        padding: 15px;
+        &:hover{
+          background: $blue;
+          color: $yellow;
+        }
+      }
+    }
+  }
+}
+button, input[type="submit"]{
+  background-color: $blue;
+  border-radius: 0;
+}
+.infoWindowAddrSpan{
+  font-size: 0.6em;
+}
+
+@-moz-document url-prefix() {
+  .heroBoxes{
+    .heroBox{
+      display: block;
+
+      h4{
+        display: inline-block;
+        margin: 15px auto 0;
+      }
+    }//heroBox
+  }//heroBoxes
+}

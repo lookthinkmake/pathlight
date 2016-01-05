@@ -1,0 +1,1259 @@
+{#
+ # News entry template
+ # -------------------
+ #
+ # This template gets loaded whenever a News entry’s URL is
+ # requested. That’s because the News section’s Template setting is
+ # set to “news/_entry”, the path to this template.
+ #
+ # When this template is loaded, it will already have an ‘entry’
+ # variable, set to the requested News entry.
+ #
+ # See this page for more details on how Craft routes requests:
+ # http://buildwithcraft.com/docs/routing
+ #}
+
+{% extends "_layout" %}
+
+{% block content %}
+<script>document.getElementsByTagName('body')[0].className+='internal'</script>
+        <section class="copySection">
+            <div class="copySectionCopy">
+                <h2>Search {{entry.title}}</h2>
+                {{globalListingsInfo.heading}}
+                <span class="alsoSearch">ALSO SEARCH: {% for city in craft.entries.section('searchRentals').order('title') %}
+                    {% if city.id != entry.id %}
+                        <a style="display: none;" href="{{ city.url }}?amnts={{city.queryStringValue}}">{{city.title}}</a>
+                    {% endif %}
+                {% endfor %}</span>
+            </div><!-- /.copySectionCopy -->
+        </section><!-- /copySection -->
+<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?sensor=false'></script>
+    <script type='text/javascript' > var googleMapsAPIVersion = 3; </script>
+    <script type='text/javascript' src='http://app.propertyware.com/pw/website/widgets/config.jsp?wid={{globalListingsInfo.propertywareConfigId}}'></script>
+    <script type='text/javascript' src='http://app.propertyware.com/pw/website/widgets/pw_widgets_v2.js?sid={{globalListingsInfo.propertywareWidgetId}}'></script>
+    <script type='text/javascript'>
+    var listingWidgetForSaleMode      = false;
+    var listingWidgetDefaultMapVisible = false;
+
+        var zip_code_range = [
+              {% for city in craft.entries.section('searchRentals') %}
+                  {
+                      'city' : '{{ city.title }}',
+                      'query_string': '{{ city.queryStringValue }}',
+                      'start_zip' : {{ city.zipCodeStart }},
+                      'end_zip' : {{ city.zipCodeEnd }},
+                      'is_listed' : false,
+                      'slug' : '{{ city.slug }}',
+                      'prop_count': 0
+                  },
+              {% endfor %}
+          ];
+
+    </script>
+    <script>
+    /* Read a page's GET URL variables and return them as an associative array. */
+    function getUrlVars() {
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++) {
+    hash = hashes[i].split('=');
+    vars.push(hash[0]);
+    vars[hash[0]] = hash[1];
+    }
+    return vars;
+    }
+    var isEnterpriseWidget = getUrlVars()["isEnterpriseWidget"];
+    var scriptLink;
+    if( isEnterpriseWidget == "true" ){
+    scriptLink = "<script type='text/javascript' src='" + 'http://app.propertyware.com/pw/website/widgets/pw_enterprise_listing_widget.js' + "'></script" + ">";
+    } else {
+    scriptLink = "<script type='text/javascript' src='" + 'http://app.propertyware.com/pw/website/widgets/pw_listing_widget.js?v=3' + "'></script" + ">";
+    scriptLink += "<script type='text/javascript' src='" + 'http://app.propertyware.com/pw/javascript/underscore/underscore.js' + "'></script" + ">";
+    scriptLink += "<script type='text/javascript' src='" + 'http://app.propertyware.com/pw/javascript/propertyware/propertyware.js' + "'></script" + ">";
+    scriptLink += "<script type='text/javascript' src='" + 'http://app.propertyware.com/pw/javascript/propertyware/ui/propertyware-ui.js' + "'></script" + ">";
+    }
+    document.write( scriptLink );
+    </script>
+    <input id="searchRentalsDetails" value="searchRentalsDetails" type="hidden" />
+    <div id="pw_listing_widget" style="display: none">
+        <div id="pw_listing_widget_search_div" class="ui-widget ui-widget-content ui-corner-all">
+            <form id="pw_listing_widget_searchForm" name="searchRentals" action="" method="get">
+                <input type="hidden" id="sortField" name="sort" value=""/>
+                <input type="hidden" id="pw_listing_widget_searchFormSelectedTab" name="selectedTab" value="pw_listing_widget_tabs_map" size="100"/>
+                <div id="searchForm" border="0" cellpadding="0" cellspacing="0">
+
+                    <div class="locationSection">
+                    <label placeholder="First name">Location</label>
+                    <input id="addrField" onfocus="value='';" name="addr" type="text" placeholder="City & State, Zip, Address or Neighborhood" />
+                    </div>
+
+
+                    <div class="priceRangeSection">
+                    <label style="text-align: left">Price Range</label>
+                    <input id="minField" onfocus="value='';" name="min" value="" type="text" placeholder="$Min" />
+                    <input id="maxField" onfocus="value='';" name="max" value="" type="text" placeholder="$Max" />
+                    </div><!-- /.priceRangeSection -->
+
+                    <div class="typeSection">
+                        <label id="pSearchTypeLabel">Type</label>
+                        <select id="typeField" placeholder="Type" name="type" ></select>
+                    </div>
+                    <div class="availableSection">
+                        <label>Available</label>
+
+                        <div class="dateSelection first">
+                        <p>Any Date</p>
+                            <input id="availableAnyDateRadio" type="radio" name="anyDate" checked="true" value="true"/>
+                        </div>
+                        <div class="dateSelection">
+                        <p>Specific Date</p>
+                        <input id="availableSpecificDateRadio" type="radio" name="specificDate" value="true" />
+                        <input id="availableDatePicker" type="text" name="availableDate" disabled="disabled" value="" />
+                        </div>
+                    </div>
+
+                    <script language="javascript">
+                    function toggleAvailableDateRadios(event){
+                    var unselected = event.target.id === 'availableSpecificDateRadio'? 'availableAnyDateRadio' : 'availableSpecificDateRadio';
+                    var selected = event.target.id === 'availableSpecificDateRadio'? 'availableSpecificDateRadio' : 'availableAnyDateRadio';
+                    if(event.target.checked){
+                    jQuery('#' + unselected).removeAttr('checked');
+                    var datePicker = jQuery('#availableDatePicker');
+                    if(unselected === 'availableSpecificDateRadio'){
+                    datePicker.attr('disabled', 'disabled');
+                    datePicker.val("");
+                    }else{
+                    datePicker.removeAttr('disabled');
+                    }
+                    }
+                    }
+                    var parametersMap = getUrlVars();
+                    if(!parametersMap.anyDate && parametersMap.specificDate){
+                    jQuery('#availableDatePicker').val(decodeURIComponent(parametersMap.availableDate));
+                    jQuery('#availableDatePicker').removeAttr('disabled');
+                    jQuery('#availableAnyDateRadio').removeAttr('checked');
+                    jQuery('#availableSpecificDateRadio').attr("checked","true");
+                    }
+                    jQuery('#availableDatePicker').datepicker();
+                    jQuery('#availableSpecificDateRadio').change(toggleAvailableDateRadios);
+                    jQuery('#availableAnyDateRadio').change(toggleAvailableDateRadios);
+                    </script>
+
+                    <div class="bedSelection">
+                    <label>Beds</label>
+                    <select id="bedsField" name="beds" placeholder="Beds">
+                        <option value="">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                        <option value="5">5+</option>
+                        <option value="6">6+</option>
+                    </select>
+                    </div>
+
+                    <div class="bathSelection">
+                    <label>Baths</label>
+                    <select id="bathsField" placeholder="Baths" name="baths">
+                        <option value="">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                    </select>
+                    </div>
+                    <div class="searchButtonSection">
+                        <input id="pSeachButton" class="btn primary" value="Search" type="submit">
+                    </div>
+                    <div class="searchOptionsSection">
+                        <span id="moreSearchOptsSpan">More Search Options</span>
+                    </div>
+
+                    <div id="moreOptsRow" style="display: none  ">
+                        <div id="pw_listing_widget_search_leasing_contacts_div">
+                            <span style="font-weight: bold;">Leasing Contacts</span><br />
+                        <ul id="pw_listing_widget_search_leasing_contacts_list"> </ul>
+                    </div>
+                    <div id="pw_listing_widget_search_amenities_div">
+                        <span style="font-weight: bold;">Amenities</span><br />
+                    <ul id="pw_listing_widget_search_amenities_list"> </ul>
+                </div>
+            </div>
+            </div><!-- /.searchForm -->
+        </form>
+    </div>
+    <br />
+    <div id="pw_listing_widget_tabs">
+        <ul>
+            <li><a id="pw_listing_widget_tabs_map_link" rel="history" href="#pw_listing_widget_tabs_map">Map</a></li>
+            <li><a id="pw_listing_widget_tabs_list_link" rel="history" href="#pw_listing_widget_tabs_list">List</a></li>
+            <li><a id="pw_listing_widget_tabs_detail_link" rel="history" href="#pw_listing_widget_tabs_detail">Detail</a></li>
+        </ul>
+        <!-- Google maps tab go here -->
+        <div id="pw_listing_widget_tabs_map">
+            <h2><span id="pw_listing_widget_tabs_map_number_listings"> </span>&#160;Available Listings</h2>
+            <br />
+            <div class="pw_listing_widget_content_section" >
+                <div class="pw_listing_widget_content_bar" >
+                    <a href="javascript:showPreviousOnMap()()">< Prev</a>
+                    <a id="pw_listing_widget_tabs_map_BrochureLink" href="javascript:viewListingBrochure()"><span>Brochure</span></a>
+                    <a id="pw_listing_widget_tabs_map_NotifyMe" href="javascript:showWaitListform(false,true)"><span>Notify Me</span></a>
+                    <a href="javascript:showNextOnMap()">Next ></a>
+
+                    </div><!-- /pw_listing_widget_content_section -->
+                    <div id="pw_listing_widget_tabs_main_map" style="width: 100%; height: 350px"> </div>
+                    </div><!-- /pw_listing_widget_content_section -->
+                </div>
+                <!-- Listing goes here -->
+                <div id="pw_listing_widget_tabs_list">
+                    <h3><span id="pw_listing_widget_tabs_list_number_listings"> </span>&#160;Available Listings</h3>
+                    <br />
+                    <div class="pw_listing_widget_content_section" >
+                        <div class="pw_listing_widget_content_bar" >
+                            <div style="width:100%; font-size: 1em">
+                                <div>
+                                    <div style="margin: 0; padding:0">
+                                        <a id="pw_listing_widget_tabs_list_BrochureLink" href="javascript:viewListingBrochure()"><span>Brochure</span></a>
+                                        <a id="pw_listing_widget_tabs_list_NotifyMe" href="javascript:showWaitListform(false,true)"><span>Notify Me</span></a>
+                                    </div>
+                                    <div style="margin: 0; padding:0; text-align: right">
+                                        <form action="" name="sortForm" style="margin:0; padding:0">
+                                            <select id="sortSelect" name="sort">
+                                                <option selected="true" value="">Sort:</option>
+                                                <option value="pHl">Price (high to low)</option>
+                                                <option value="pLh">Price (low to high)</option>
+                                                <option value="availableSooner">Available (soonest)</option>
+                                                <option value="availableLater">Available (latest)</option>
+                                                <option value="sqHl">SqFt (high to low)</option>
+                                                <option value="sqLh">SqFt (low to high)</option>
+                                                <option value="pSqHl">Price/SqFt (high to low)</option>
+                                                <option value="pSqlH">Price/SqFt (low to high)</option>
+                                                <option value="bedHl">Bedrooms (high to low)</option>
+                                                <option value="bedLh">Bedrooms (low to high)</option>
+                                                <option value="baHl">Bathrooms (high to low)</option>
+                                                <option value="baLh">Bathrooms (low to high)</option>
+                                            </select>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul id="pw_listing_widget_tabs_list_ul">
+                            <li id="pw_listing_widget_tabs_list_item_0" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_1" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_2" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_3" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_4" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_5" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_6" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_7" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_8" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_9" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_10" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_11" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_12" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_13" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_14" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_15" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_16" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_17" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_18" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_19" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_20" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_21" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_22" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_23" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_24" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_25" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_26" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_27" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_28" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_29" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_30" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_31" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_32" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_33" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_34" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_35" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_36" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_37" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_38" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_39" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_40" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_41" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_42" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_43" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_44" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_45" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_46" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_47" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_48" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                            <li id="pw_listing_widget_tabs_list_item_49" style="display:none; ">
+                                <div class="listTable">
+                                    <div class="listItemImgTd">
+                                        <a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a>
+                                        <br/>
+                                        <a class="listItemImgTdMapLink" href="">Map</a>
+                                    </div>
+                                    <div class="listItemDescTd"></div>
+                                    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle"/>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Unit Detail goes here -->
+                <div id="pw_listing_widget_tabs_detail">
+                    <div width="100%">
+                        <div>
+                            <div>
+                                <div id="pw_listing_widget_tabs_detail_back_to_building">
+                                    <a href="javascript:goBackToBuilding()"><img src="http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_tabs_detail_detailImageLeft.png" alt="" border="0" align="top"/>Back to Building</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="pw_listing_widget_tabs_detail_container" style="display: none">
+                        <div >
+                            <div class="listingHeader">
+                                <h3 id="pw_listing_widget_tabs_detail_posting_title"></h3>
+                                <p id="pw_listing_widget_tabs_detail_address"></p>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="pw_listing_widget_content_section" >
+                            <div id="pw_listing_widget_tabs_detail_top_section">
+                                <div width="100%">
+                                    <a class="button" style="margin-left: 72px;" id="pw_listing_widget_tabs_detail_detailApplyOnlineLink" target="_blank" href="">Apply Online</a>
+                                    <div style="position: relative; overflow: hidden;">
+                                        
+                                        <div id="pw_listing_widget_tabs_detail_image_browser">
+                                            <div id="pw_listing_widget_tabs_detail_imageContainer"><img id="pw_listing_widget_tabs_detail_image" src="http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png" alt="Unit Image" width="181" height="181"></div>
+                                            <div id="pw_listing_widget_tabs_detail_imageControls">
+                                                <a id="pw_listing_widget_tabs_detail_detailImageLeft"><i class="fa fa-arrow-circle-left"></i></a>
+                                                <a id="pw_listing_widget_tabs_detail_detailImageCounter" ><i class="fa fa-search"></i></a>
+                                                <a id="pw_listing_widget_tabs_detail_detailImageRight" ><i class="fa fa-arrow-circle-right"></i></a>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 id="pw_listing_widget_tabs_detail_price"></h3>
+                                            <div id="pw_listing_widget_tabs_detail_summary" style="position: relative;" width="100%">
+                                                <div class="hideWhenMultiBuilding hideWhenForSale">
+                                                    <h5>Deposit:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_deposit"></span>
+                                                </div>
+                                                <div id="pw_listing_widget_tabs_detail_available_row">
+                                                    <h5>Available:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_available"></span>
+                                                </div>
+                                                <div>
+                                                    <h5 class="hideWhenForSale">Min. Lease:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_min_lease"></span>
+                                                </div>
+                                                <div>
+                                                    <h5>Unit Type:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_type"></span>
+                                                </div>
+                                                <div>
+                                                    <h5>Total Area:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_area"></span>
+                                                </div>
+                                                <div class="hideWhenMultiBuilding">
+                                                    <h5>Bedrooms:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_bed"></span>
+                                                </div>
+                                                <div class="hideWhenMultiBuilding">
+                                                    <h5>Bathrooms:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_bath"></span>
+                                                </div>
+                                                <div class="hideWhenMultiBuilding">
+                                                    <h5>Smoking:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_smoking"></span>
+                                                </div>
+                                                <div class="hideWhenMultiBuilding">
+                                                    <h5>Pets:</h5>
+                                                    <span id="pw_listing_widget_tabs_detail_pets"></span>
+                                                </div>
+                                            </div>
+                                            <div></div>
+                                        </div>
+                                        <div>
+                                            <img class="showWhenMultiBuilding" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pw_listing_widget_content_bar" >
+                                <a class="prevButton" href="javascript:gotoPreviousBuilding()">< Prev</a>
+                                <a id="pw_listing_widget_tabs_detail_detailBrochureLink" href="javascript:viewDetailBrochure()">Brochure</a>
+                                <a id="pw_listing_widget_tabs_detail_detailMapsAndDirectiosLink" href="javascript:getDirections()">Directions</a>
+                                <a id="pw_listing_widget_tabs_detail_detailContactAgentLink" href="javascript:showContactAgentTab()">Contact Agent</a>
+                                <a id="pw_listing_widget_tabs_detail_addThisAnchor" href="http://www.addthis.com/bookmark.php?v=250" onmouseover="return addthis_open(this, '', 'https://webreq.propertyware.com/pw/website/widgets/addthis/'+listingWidgetCurrentBuildingOrUnit.id, 'Property info');" onmouseout="addthis_close();" onclick="return addthis_sendto();">Bookmark &amp; Share</a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js?pub=xa-4a2557820e2be226"></script>
+                                <a class="nextButton" href="javascript:gotoNextBuilding()">Next ></a>
+                            </div>
+                        <br />
+                        <div class="inner_tabs">
+                            <div id="pw_listing_widget_tabs_detail_inner_tabs">
+                                <ul class="tabs">
+                                    <li><a href="#tabs-1" class="active">Details</a></li>
+                                    <li><a href="#tabs-2">Maps &amp; Explore</a></li>
+                                    <li><a href="#tabs-3">Community Info</a></li>
+                                    <li><a href="#tabs-4">Tools</a></li>
+                                    <li id="contactAgentTabHeader"><a id="contactAgentAnchor" href="#tabs-5">Contact Agent</a></li>
+                                </ul>
+                    <div  class="tabContents" id="tabs-1">
+                        <div id="pw_listing_widget_tabs_detail_available_units" class="detailContent">
+                            <h3>Available Units</h3>
+                            <table style="width: 100%">
+                                <thead>
+                                <tr id="pw_listing_widget_tabs_detail_available_units_header_tr"></tr>
+                                </thead>
+                                <tbody id="pw_listing_widget_tabs_detail_available_units_header_tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_available_floor_plans" class="detailContent">
+                            <h3>Available Floor Plans</h3>
+                            <table style="width: 100%">
+                                <thead>
+                                <tr id="pw_listing_widget_tabs_detail_available_floor_plans_header_tr"></tr>
+                                </thead>
+                                <tbody id="pw_listing_widget_tabs_detail_available_floor_plans_tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_video" class="detailContent" style="display:none">
+                            <h3>Video</h3>
+                            <div id="pw_listing_widget_tabs_detail_video_div"></div>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_description" class="detailContent">
+                            <h3>Description</h3>
+                            <p id="pw_listing_widget_tabs_detail_description_p" ></p>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_driving_directions" class="detailContent">
+                            <h3>Driving Directions</h3>
+                            <p id="pw_listing_widget_tabs_detail_driving_directions_p" ></p>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_other_tenant_charges" style="display:none" class="detailContent">
+                            <h3>Other Tenant Charges</h3>
+                            <p id="pw_listing_widget_tabs_detail_other_tenant_charges_p" ></p>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_description_amenities" class="detailContent">
+                            <h3>Amenities</h3>
+                            <ul id="pw_listing_widget_tabs_detail_description_amenities_ul"></ul>
+                        </div>
+
+                        <div id="pw_listing_widget_tabs_detail_other" class="detailContent" style="display: none">
+                            <h3>Other Information</h3>
+                            <ul id="pw_listing_widget_tabs_detail_other_ul"></ul>
+                        </div>
+
+                        <div id="leasingContactDiv" class="detailContent leasing-contact">
+                            <h3>Leasing Contact</h3>
+                            <table id="pw_listing_widget_tabs_detail_leasingContactTable">
+                                <tbody>
+                                <tr>
+                                    <td><img alt="" id="pw_listing_widget_tabs_detail_leasingContactImgTag" src="http://app.propertyware.com/pw/website/widgets/images/leasingContactPic.png" width="70" height="80"></td>
+                                    <td>
+                                        <span id="pw_listing_widget_tabs_detail_detailLeaseContactName" class="leasingContactName"></span>
+                                        <span id="pw_listing_widget_tabs_detail_detailLeaseContactCompany"></span>
+                                        <span id="pw_listing_widget_tabs_detail_detailLeaseContactEmail"></span>
+                                        <span id="pw_listing_widget_tabs_detail_detailLeaseContactPhone"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div  class="tabContents" id="tabs-2">
+                        <div id="pw_listing_widget_tabs_detail_map" style="width: 100%; height:350px"></div>
+                        <div id="pw_listing_widget_tabs_detail_streetview" style="width: 100%; height:350px"></div>
+                    </div>
+                    <div class="tabContents" id="tabs-3">
+                        <div id="pw_listing_widget_tabs_detail_detailCommunityInfo">
+                            <ul>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Schools_Nearby" href="http://nces.ed.gov/ccd/schoolsearch/school_list.asp" target="_blank">Schools Nearby</a></li>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Neighborhood_Profile" href="http://www.walkscore.com/score/" target="_blank">Neighborhood Profile</a></li>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Stores_Nearby" href="http://www.yelp.com/search?find_desc=shopping&ns=1&find_loc=" target="_blank">Stores Nearby</a></li>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Restaurants_Nearby" href="http://www.yelp.com/search?find_desc=&amp;find_loc=&amp;x=41&amp;y=13&amp;cflt=restaurants" target="_blank">Restaurants Nearby</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tabContents" id="tabs-4">
+                        <div id="pw_listing_widget_tabs_detail_detailTools">
+                            <ul id="pw_listing_widget_tabs_detail_detailTools_ul" >
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Walkscore" href="http://www.walkscore.com/get-score.php" target="_blank">Walkscore</a></li>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_Homethinking" href="http://neighborhoods.homethinking.com/" target="_blank">Homethinking</a></li>
+                                <li><a id="pw_listing_widget_tabs_detail_detailTools_CityData" href="http://www.city-data.com/" target="_blank">City Data</a></li>
+                                <li>Listing Link: <input id="pw_listing_widget_tabs_detail_detailTools_ListingLink" size="60" value="" type="text" /></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tabContents" id="tabs-5">
+                        <div id="errors"></div>
+                        <form id="guestCardForm" name="contactAgentForm" class="" action="#" method="post" onsubmit="return validateContactAgent(1);">
+                            <input name="sid" id="sid" value="" type="hidden" />
+                            <input name="cid" id="cid" value="" type="hidden" />
+                            <input name="uid" id="uid" value="" type="hidden" />
+                            <input name="retUrl" id="retUrl" value="" type="hidden" />
+                            <input name="frm" id="frm" value="guestCardForm" type="hidden" />
+                            <input name="ajaxMode" id="ajaxMode" value="true" type="hidden" />
+                            <input name="pwreferrer" id="pwreferrer" value="" type="hidden" />
+                            <input name="pwcampaign" id="pwcampaign" value="" type="hidden" />
+                            <fieldset id="contactUsFieldset">
+                                <div class="autoscroll">
+                                    <div class="legend" ><span>Required Fields</span></div>
+                                    <div id="contactUsTable">
+                                        <div>
+                                            <div class="required">First Name</div>
+                                            <input name="webform.guest.primaryContact.firstName" id="webform.guest.primaryContact.firstName" size="16" maxlength="30" class="text" tabindex="1" type="text" />
+                                            <div class="required">Last Name</div>
+                                            <input name="webform.guest.primaryContact.lastName" id="webform.guest.primaryContact.lastName" size="16" maxlength="30" class="text" tabindex="2" type="text"/>
+                                            <div>Email Address</div>
+                                            <input name="webform.guest.primaryContact.email" id="webform.guest.primaryContact.email" size="40" maxlength="60" class="text" tabindex="3" type="text"/>
+                                            <div>Home Phone</div>
+                                            <input name="webform.guest.primaryContact.homePhone" id="webform.guest.primaryContact.homePhone" size="16" maxlength="20" class="text" tabindex="4" type="text" onchange="formatPhone(this)"/>
+                                            <div>Mobile Phone</div>
+                                            <input name="webform.guest.primaryContact.mobilePhone" id="webform.guest.primaryContact.mobilePhone" size="16" maxlength="20" class="text" tabindex="5" type="text" onchange="formatPhone(this)"/>
+                                            <div>Fax</div>
+                                            <input name="webform.guest.primaryContact.fax" id="webform.guest.primaryContact.fax" size="16" maxlength="20" class="text" tabindex="6" type="text" onchange="formatPhone(this)"/>
+                                            <div class="required">Preferred Contact Method</div>
+                                            <select name="webform.guest.preferredContactMethod" id="webform.guest.preferredContactMethod" class="text" tabindex="7" />
+                                                <option value="">Choose</option>
+                                                <option value="Email">Email</option>
+                                                <option value="Home Phone">Home Phone</option>
+                                                <option value="Mobile Phone">Mobile Phone</option>
+                                            </select>
+                                            <div id="questionMoveInDate">
+                                                <div>What is your desired move in date?</div>
+                                                <input name="webform.guest.moveInDateAsString" id="moveInDateAsString" type="text" size="10" tabindex="8" />
+                                                <script>
+                                                $(function() {
+                                                // $( "#moveInDateAsString" ).datepicker();
+                                                });
+                                                </script>
+                                            </div>
+                                            <div id="questionWhichCity">
+                                                <div>Which city are you interested in?</div>
+                                                <select name="webform.guest.cityDesired" id="webform_guest_cityDesired" class="text" tabindex="9" />
+                                                    <option value="">Choose</option>
+                                                </select>
+                                            </div>
+                                            <div id="questionWhichNeighborhood">
+                                                <div>Which neighborhood are you interested in?</div>
+                                                <select name="webform.guest.neighborhoodDesired" id="webform_guest_neighborhoodDesired" class="text" tabindex="10" />
+                                                    <option value="">Choose</option>
+                                                </select>
+                                            </div>
+                                            <div id="questionWhichTypeOfUnit">
+                                                <div>What is your preferred Unit Type?</div>
+                                            <select name="webform.guest.unitTypeDesired"  id="webform_guest_unitTypeDesired" class="text" tabindex="11"></select>
+                                        </div>
+                                        <div>What is your desired rent range?</div>
+                                        <input type="text" name="webform.guest.rentMinAsString" id="webform.guest.rentMinAsString" class="text" tabindex="12" size="10"  onchange="formatCurrency(this)"/>
+                                        To
+                                        <input type="text" name="webform.guest.rentMaxAsString" id="webform.guest.rentMaxAsString" class="text" tabindex="13" size="10"  onchange="formatCurrency(this)"/>
+                                        <div>What is your current home type?</div>
+                                        <select name="webform.guest.currentHomeType" id="webform.guest.currentHomeType" class="text" tabindex="14">
+                                            <option value="" style="display: none"></option>
+                                            <option value="Single Family Home">Single Family Home</option>
+                                            <option value="Apartment">Apartment</option>
+                                            <option value="Duplex/Quad">Duplex/Quad</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div>
+                                            How long have you lived at your current residence?
+                                        </div>
+                                        <select name="webform.guest.timeAtCurrentResidence" id="webform.guest.timeAtCurrentResidence" class="text" tabindex="15">
+                                            <option value="" style="display: none"></option>
+                                            <option value="Less than 1 year">Less than 1 year</option>
+                                            <option value="1 - 2 years">1 - 2 years</option>
+                                            <option value="3 - 5 years">3 - 5 years</option>
+                                            <option value="5+ years">5+ years</option>
+                                        </select>
+                                        <div>
+                                            What is your current rent/mortgage?
+                                        </div>
+                                        <input type="text" name="webform.guest.currentRentMortgageAsString" id="webform.guest.currentRentMortgageAsString" class="text" size="15" onchange="formatCurrency(this)" maxlength="14" tabindex="16" />
+                                        <div>What is your reason for moving?</div>
+                                        <div>
+                                            <input type="text" name="webform.guest.reasonForMoving" id="webform.guest.reasonForMoving" class="text" size="32" maxlength="30" tabindex="17"/>
+                                        </div>
+                                        <div id="questionHavePets">
+                                            <div>Do you have pets?</div>
+                                            <select name="webform.guest.hasPets" id="webform.guest.hasPets" class="text" tabindex="18" onchange="showHidePetQuestions(this)">
+                                                <option value="false">No</option>
+                                                <option value="true">Yes</option>
+                                            </select>
+                                        </div>
+                                        <div id="questionNumberOfPets" style="display: none;">
+                                            <div>Number of Pets?</div>
+                                            <input type="text" name="webform.guest.numberOfPets" id="webform.guest.numberOfPets" class="text" size="5" maxlength="3" tabindex="19"/>
+                                        </div>
+                                        <div id="questionPetType" style="display: none;">
+                                            <div>Pet Type</div>
+                                            <select name="webform.guest.petType" id="webform.guest.petType" class="text" tabindex="20">
+                                                <option value="None">None</option>
+                                                <option value="Dog">Dog</option>
+                                                <option value="Cat">Cat</option>
+                                                <option value="Dog & Cat">Dog & Cat</option>
+                                                <option value="Bird">Bird</option>
+                                                <option value="Hamster">Hamster</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div id="questionPetWeight" style="display: none;">
+                                            <div>What is the weight (in pounds) of the heaviest pet?</div>
+                                            <input type="text" name="webform.guest.petWeights" id="webform.guest.petWeights" class="number" size="12" maxlength="15" tabindex="21"/>
+                                        </div>
+                                        <div>Comments</div>
+                                        <textarea name="webform.guest.comments" id="webform.guest.comments" cols="40" rows="5" class="Textarea" tabindex="22"></textarea>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="primaryButtons">
+                                    <input id="contactUsButton" class="btn primary" value="Submit" tabindex="23" type="submit">
+                                </div>
+                                <br>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Floor Plan goes here -->
+<div id="pw_listing_widget_tabs_floor_plan" style="display: none">
+    <div width="100%">
+        <div id="pw_listing_widget_tabs_floor_plan_back_to_building">
+            <a href="javascript:goBackToBuilding()"><img src="http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_tabs_detail_detailImageLeft.png" alt="" border="0" align="top"/>Back to Building</a>
+        </div>
+    </div>
+    <div id="pw_listing_widget_tabs_floor_plan_container" >
+        <div id="pw_listing_widget_tabs_floor_plan_top_section"  class="detailContent">
+            <div>
+                <h3 id="pw_listing_widget_tabs_floor_plan_name"></h3>
+                <div id="pw_listing_widget_tabs_floor_plan_summary" width="100%">
+                    <div scope="row">Rent</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_price"></div>
+                    <div scope="row">Bedrooms:</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_bed"></div>
+                    <div scope="row">Deposit:</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_deposit"></div>
+                    <div scope="row">Bathrooms:</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_bath"></div>
+                    <div id="pw_listing_widget_tabs_floor_plan_other_charges_label" scope="row">Other Charges:</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_other_charges"></div>
+                    <div scope="row">Total Area:</div>
+                    <div id="pw_listing_widget_tabs_floor_plan_area"></div>
+                </div>
+            </div>
+            <div>
+                <img class="showWhenMultiBuilding" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle" />
+            </div>
+        </div>
+        <div id="pw_listing_widget_tabs_floor_plan_photos" class="detailContent">
+            <div id="pw_listing_widget_tabs_floor_plan_photos_slider">
+            </div>
+        </div>
+        <div id="pw_listing_widget_tabs_floor_plan_video" class="detailContent">
+            <h3>Video</h3>
+            <div id="pw_listing_widget_tabs_floor_plan_youtube"></div>
+        </div>
+        <div id="pw_listing_widget_tabs_floor_plan_amenities" class="detailContent">
+            <h3>Amenities</h3>
+        <ul id="pw_listing_widget_tabs_floor_plan_amenities_ul"></ul>
+    </div>
+</div>
+</div>
+</div>
+<div id="pw_listing_widget_tabs_detail_directions_dialog" title="Get Directions" style="display:none">
+<form action="#" name="pw_listing_widget_tabs_detail_directionsForm" id="pw_listing_widget_tabs_detail_directionsForm" title="Get Directions">
+<div style="width: 100%">
+    <div>From:</div>
+    <div><input id="pw_listing_widget_tabs_detail_directions_dialog_fromAddress" name="pw_listing_widget_tabs_detail_directions_dialog_fromAddress" type="text" /></div>
+</div>
+<div class="primaryButtons">
+    <input id="pw_listing_widget_tabs_detail_directionsForm_Go" value="Go" type="button" />
+    <input id="pw_listing_widget_tabs_detail_directionsForm_Cancel" value="Cancel" type="button" />
+</div>
+</form>
+</div>
+<div id="pw_listing_widget_wait_list_dialog" title="Notify Me" style="display: none">
+<div class="waitListDiv">
+<div id="waitListDiv">
+    <form id="waitListForm" class="webform" action="" method="post" onsubmit="">
+        <div class="legend" style="text-align: right"><span style="margin-right: 45px; border-left: 3px solid red">Required Fields</span></div>
+        <div class="edit" id="waitListTable">
+            <div class="required">First Name</div>
+            <div><input name="webform.contact.contact.firstName" size="16" maxlength="30" class="text" type="text" /></div>
+            <div class="required">Last Name</div>
+            <div><input name="webform.contact.contact.lastName" size="16" maxlength="30" class="text"  type="text" /></div>
+            <div class="required">Email</div>
+            <div><input name="webform.contact.contact.email" size="40" maxlength="60" class="text" type="text"></div>
+            <div>Work Phone</div>
+            <div><input name="webform.contact.contact.workPhone" id="webform.contact.contact.workPhone" size="16" maxlength="20" class="text" type="text" /></div>
+            <div>Desired City/State or Province/Zip or Postal Code</div>
+            <div><input name="webform.contact.contact.city" size="20" maxlength="60" class="text" type="text"> <input name="webform.contact.contact.state" size="2" class="text" type="text" />
+            <input name="webform.contact.contact.zip" size="10" class="text" type="text" /></div>
+            <div>Monthly Rent</div>
+            <div> $<input name="webform.contact.contact.rentMin" size="5" class="text" type="text" /> to
+            $<input name="webform.contact.contact.rentMax" size="5" class="text" type="text" /></div>
+            <div>Bedrooms / Bathrooms</div>
+            <div><input name="webform.contact.contact.beds" size="5" class="text" type="text" /> /
+            <input name="webform.contact.contact.baths" size="5" class="text" type="text" /></div>
+            <div>Desired move in date?</div>
+            <input name="webform.contact.moveInDateAsString" id="webform.contact.moveInDateAsString" size="15" maxlength="10" class="date hasDatepicker" type="text" /> (i.e. 01/13/2006)
+            <div>Comments</div>
+            <div><textarea name="webform.contact.comments" cols="40" rows="5" class="Textarea"> </textarea></div>
+        </div>
+        <div class="primaryButtons">
+            <input type="hidden" id="forSalePage" value="false" />
+            <input class="btn primary " id="submitTenantWaitListForm" value="Submit" type="button" />
+            <input class="btn " id="cancelTenantWaitListForm" value="Cancel" type="button" />
+        </div>
+    </form>
+</div>
+</div>
+</div>
+<div id="pw_listing_widget_wait_list_dialog_confirmation" title="Confirmation" style="display:none">
+<p>Your request has been received. We will contact you as soon as possible. Thank you.</p>
+</div>
+<div class="pw_listing_widget_tabs_map_info_window_template" style="display: none;  ">
+<div style="height:150px; width: 150px">
+<div class="infoWindowTable">
+    <div><img width="50" height="50" class="infoWindowImg" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png' alt="Thumbnail"/></div>
+    <div><span class="infoWindowAddrSpan"></span><br /><span class="infoWindowCityStateZipSpan"></span></div>
+    <div colspan='2'><b>Price:</b> <span class="infoWindowPriceSpan"></span></div>
+    <div colspan='2'><b>Type:</b> <span class="infoWindowTypeSpan"></span></div>
+    <div colspan='2'><span class="infoWindowDescSpan"></span></div>
+    <div colspan='2'><span class="infoWindowMoreDetails">More Details</span></div>
+</div>
+</div>
+</div>
+<li class="pw_listing_widget_tabs_list_item_template" style="display:none; ">
+<div class="listTable">
+<div class="listItemImgTd"><a class="listItemImgTdUnitLink" href="#"><img class="pw_listing_widget_tabs_list_item_img" src='http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png'  alt="Thumbnail" border="0"/></a> <br /> <a class="listItemImgTdMapLink" href="">Map</a></div>
+<div class="listItemDescTd"></div>
+<div style="width: 48px">
+    <img class="showWhenMultiBuilding" width="48" height="48" style="display:none" src="http://app.propertyware.com/pw/website/widgets/images/multi-unit.png" alt="" border="0" align="middle" />
+</div>
+</div>
+</li>
+<div id="pw_listing_widget_image_popup" style="background-color:transparent;opacity:100;z-index:2001;text-align:center;position:absolute;display:none;" >
+<div>
+<div style="text-align:right;"><img style="cursor:pointer" id="imageClose" alt="Close" src="http://app.propertyware.com/pw/website/widgets/images/close.png"></div>
+<div style="text-align:center;">
+    <div style="border: 5px solid white; background-color: white">
+        <img  alt="No Photo" id="popupImg" src="http://app.propertyware.com/pw/website/widgets/images/pw_listing_widget_no_photo.png"/>
+        <h2 id="popupImgCaption">No Caption</h2>
+    </div>
+</div>
+<div style="text-align:center;">
+    <img id="zoomLeft" style="cursor:pointer" alt="Left" src="http://app.propertyware.com/pw/website/widgets/images/left.png"/>
+    <img id="zoomRight" style="cursor:pointer" alt="Right" src="http://app.propertyware.com/pw/website/widgets/images/right.png"/>
+</div>
+</div>
+</div>
+</div>
+<section class="copySection">
+    <div class="copySectionCopy">
+       {{ include(template_from_string(globalListingsInfo.body)|raw) }}
+    </div><!-- /.copySectionCopy -->
+</section><!-- /copySection -->
+{% endblock %}
